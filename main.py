@@ -2,6 +2,7 @@ import pygame
 import constant
 from pygame.locals import *
 from sys import exit
+
  
 pygame.init()
 level = 1
@@ -12,37 +13,59 @@ player = pygame.image.load(player_image_file).convert()
 player_x = 0
 player_y = 300
 
-ground = 300	# the ground position y coordinate
-total_jump_time = 400	# total time of a jump
-height = 200	# height of a jump
-jump_time = total_jump_time	# jump time
+inf = 1000000		#  setting the bottom limit
+deadline = 1000		# the falling deadline
 
-pipe = 0
+total_jump_time = 400	# total time of a jump on a ground
+height = 200	# height of a jump on a ground
+
+move_speed = 0.5    #horizontal move speed
+a = -4 * height / (total_jump_time ** 2)  # coefficient of jump action
+up_speed = 0	# the speed of up going
+
+pipe = 0     # to indicate weather there is a pipe
+
+
+def getGround(player_x):   # to get the ground y coordinate, it is set in advance
+	if player_x < 500:
+		return 300
+	elif player_x < 640:
+		return inf
 
 while True:
 
-    if not jump_time == total_jump_time:
-        a = -4 * height / (total_jump_time ** 2)  # coefficient of jump action
-        player_y -= 2 * a * jump_time - a * total_jump_time  # height elevated of each time
-        jump_time += 1
+    ground = getGround(player_x)    # the ground position y coordinate
+    key_pressed = pygame.key.get_pressed()	# to get the list of whether or not a key is pressed
 
-        if jump_time == total_jump_time:
-        	player_y = ground		# fall to the ground
+    if not (up_speed == 0 and player_y == ground):   # determine whether to move under gravity
+    	# move under gravity
+        player_y -= up_speed  # height change of each time
+        up_speed += a  # speed change due to gravity
+
+    # fall to the ground
+    if player_y >= ground:
+    	player_y = ground
+    	up_speed = 0
+
+    if key_pressed[pygame.K_LEFT]:
+    	player_x -= move_speed  #keep moving left
+
+    if key_pressed[pygame.K_RIGHT]:
+    	player_x += move_speed
 
     for event in pygame.event.get():
         if event.type == QUIT:
             exit()
 
         if event.type == KEYDOWN:
-            flag_up = 0
-            if event.key == K_LEFT:
-                player_x -= 15
-            elif event.key == K_RIGHT:
-                player_x += 15
-            elif event.key == K_UP and jump_time == total_jump_time:
-                jump_time = 0 		#trigger jump action
+            if event.key == K_UP and player_y == ground:
+                up_speed = 1.5 		#trigger jump action at line 40
             elif event.key == K_DOWN and pipe == 1:   # for the pipe or something like that
                 player_y += 30
+
+    if player_y > deadline:   # determine whether player is falling to death
+    	print('Game Over')
+    	exit()
 
     screen.fill((0,0,0))
     board_col = (255, 255, 255)
