@@ -12,13 +12,22 @@ player = pygame.image.load(player_image_file).convert()
 player_x = 0
 player_y = 300
 
-jump_flag = 0
+ground = 300	# the ground position y coordinate
+total_jump_time = 400	# total time of a jump
+height = 200	# height of a jump
+jump_time = total_jump_time	# jump time
+
+pipe = 0
 
 while True:
 
-    if jump_flag == 1:
-        player_y += 50
-        jump_flag = 0
+    if not jump_time == total_jump_time:
+        a = -4 * height / (total_jump_time ** 2)  # coefficient of jump action
+        player_y -= 2 * a * jump_time - a * total_jump_time  # height elevated of each time
+        jump_time += 1
+
+        if jump_time == total_jump_time:
+        	player_y = ground		# fall to the ground
 
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -30,10 +39,9 @@ while True:
                 player_x -= 15
             elif event.key == K_RIGHT:
                 player_x += 15
-            elif event.key == K_UP:
-                jump_flag = 1
-                player_y -= 50
-            elif event.key == K_DOWN:   # for the pipe or something like that
+            elif event.key == K_UP and jump_time == total_jump_time:
+                jump_time = 0 		#trigger jump action
+            elif event.key == K_DOWN and pipe == 1:   # for the pipe or something like that
                 player_y += 30
 
     screen.fill((0,0,0))
