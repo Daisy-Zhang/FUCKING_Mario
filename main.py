@@ -13,6 +13,12 @@ player = pygame.image.load(player_image_file).convert()
 player_x = 0
 player_y = 300
 
+white = (255, 255, 255)
+black = (0, 0, 0)
+blue = (0, 0, 255)
+light_blue = (128, 128, 255)
+
+
 inf = 1000000		#  setting the bottom limit
 deadline = 1000		# the falling deadline
 
@@ -67,8 +73,8 @@ while True:
     	print('Game Over')
     	exit()
 
-    screen.fill((0,0,0))
-    board_col = (255, 255, 255)
+    screen.fill(light_blue)
+    board_col = white
     pygame.draw.line(screen, board_col, constant.level1_board1_start, constant.level1_board1_end, 3)
     pygame.draw.line(screen, board_col, constant.level1_board2_start, constant.level1_board2_end, 3)
     screen.blit(player, (player_x, player_y))            
