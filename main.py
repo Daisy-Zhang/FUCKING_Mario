@@ -20,21 +20,21 @@ light_blue = (128, 128, 255)
 
 
 inf = 1000000		#  setting the bottom limit
-deadline = 1000		# the falling deadline
+deadline = 700		# the falling deadline
 
-total_jump_time = 400	# total time of a jump on a ground
-height = 200	# height of a jump on a ground
+total_jump_time = 200	# total time of a jump on a ground
+height = 250	# height of a jump on a ground
 
-move_speed = 0.5    #horizontal move speed
+move_speed = 0.8    #horizontal move speed
 a = -4 * height / (total_jump_time ** 2)  # coefficient of jump action
 up_speed = 0	# the speed of up going
 
-pipe = 0     # to indicate weather there is a pipe
+pipe = 0     # to indicate whether there is a pipe
 
 
 def getGround(player_x):   # to get the ground y coordinate, it is set in advance
-	if player_x < 500:
-		return 300
+	if player_x <= constant.level1_back1_no_ground_start or player_x + constant.player_x_size / 2 >= constant.level1_back1_no_ground_end:
+		return constant.level1_back1_ground
 	elif player_x < 640:
 		return inf
 
@@ -77,6 +77,9 @@ while True:
     board_col = white
     pygame.draw.line(screen, board_col, constant.level1_board1_start, constant.level1_board1_end, 3)
     pygame.draw.line(screen, board_col, constant.level1_board2_start, constant.level1_board2_end, 3)
+
+    pygame.draw.line(screen, board_col, constant.level1_board3_start, constant.level1_board3_end, 3)
+    pygame.draw.line(screen, board_col, constant.level1_board4_start, constant.level1_board4_end, 3)
     screen.blit(player, (player_x, player_y))            
     
     pygame.display.update()
