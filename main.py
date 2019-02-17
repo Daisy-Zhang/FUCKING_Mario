@@ -8,6 +8,11 @@ pygame.init()
 level = 1
 screen = pygame.display.set_mode((640, 480), 0, 32)
 
+pygame.mixer.init()                     # BGM player
+pygame.mixer.music.load('BG.ogg')
+pygame.mixer.music.set_volume(0.2)
+pygame.mixer.music.play()
+
 player_image_file = 'image/player.png'
 player = pygame.image.load(player_image_file).convert()
 player_x = 0
