@@ -65,9 +65,9 @@ while True:
 
     # fall to the ground
     if player_y >= ground:
-    	player_y = ground
-    	up_speed = 0
-	jump_direction = 0
+        player_y = ground
+        up_speed = 0
+        jump_direction = 0
 
     if (key_pressed[pygame.K_LEFT] and player_y == ground) or jump_direction == 1:
     	player_x -= move_speed  #keep moving left
@@ -82,9 +82,9 @@ while True:
         if event.type == KEYDOWN:
             if event.key == K_UP and player_y == ground:
                 up_speed = 1.5 		#trigger jump action at line 40
-		if key_pressed[pygame.K_LEFT]:
-                	jump_direction = 1
-                elif key_pressed[pygame.K_RIGHT]:
+            if key_pressed[pygame.K_LEFT]:
+                    jump_direction = 1
+            elif key_pressed[pygame.K_RIGHT]:
                 	jump_direction = 2
             elif event.key == K_DOWN and pipe == 1:   # for the pipe or something like that
                 player_y += 30
