@@ -27,8 +27,8 @@ light_blue = (128, 128, 255)
 inf = 1000000		#  setting the bottom limit
 deadline = 700		# the falling deadline
 
-total_jump_time = 600	# total time of a jump on a ground
-height = 600	# height of a jump on a ground
+total_jump_time = 180	# total time of a jump on a ground
+height = 200	# height of a jump on a ground
 
 move_speed = 0.8    #horizontal move speed
 a = -4 * height / (total_jump_time ** 2)  # coefficient of jump action
