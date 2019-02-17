@@ -22,8 +22,8 @@ light_blue = (128, 128, 255)
 inf = 1000000		#  setting the bottom limit
 deadline = 700		# the falling deadline
 
-total_jump_time = 200	# total time of a jump on a ground
-height = 250	# height of a jump on a ground
+total_jump_time = 600	# total time of a jump on a ground
+height = 600	# height of a jump on a ground
 
 move_speed = 0.8    #horizontal move speed
 a = -4 * height / (total_jump_time ** 2)  # coefficient of jump action
@@ -82,9 +82,9 @@ while True:
         if event.type == KEYDOWN:
             if event.key == K_UP and player_y == ground:
                 up_speed = 1.5 		#trigger jump action at line 40
-            if key_pressed[pygame.K_LEFT]:
+            if key_pressed[pygame.K_LEFT] and player_y == ground:
                     jump_direction = 1
-            elif key_pressed[pygame.K_RIGHT]:
+            elif key_pressed[pygame.K_RIGHT] and player_y == ground:
                 	jump_direction = 2
             elif event.key == K_DOWN and pipe == 1:   # for the pipe or something like that
                 player_y += 30
@@ -93,7 +93,7 @@ while True:
     	print('Game Over')
     	exit()
 
-    if level == 1 :
+    if level == 1 :            
         screen.fill(light_blue)
         board_col = white
         pygame.draw.line(screen, board_col, constant.level1_board1_start, constant.level1_board1_end, 3)
