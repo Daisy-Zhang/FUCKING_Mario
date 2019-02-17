@@ -38,7 +38,21 @@ def getGround(player_x):   # to get the ground y coordinate, it is set in advanc
 	elif player_x < 640:
 		return inf
 
+def toNextLevel(player_x, player_y):
+    if level == 1:
+        if player_x + constant.player_x_size >= 630 :
+            return True
+        else:
+            return False
+
+
 while True:
+
+    if toNextLevel(player_x, player_y) :
+        if level == 1:
+            player_x = 0
+            player_y = 300
+            level += 1
 
     ground = getGround(player_x)    # the ground position y coordinate
     key_pressed = pygame.key.get_pressed()	# to get the list of whether or not a key is pressed
@@ -73,14 +87,21 @@ while True:
     	print('Game Over')
     	exit()
 
-    screen.fill(light_blue)
-    board_col = white
-    pygame.draw.line(screen, board_col, constant.level1_board1_start, constant.level1_board1_end, 3)
-    pygame.draw.line(screen, board_col, constant.level1_board2_start, constant.level1_board2_end, 3)
+    if level == 1 :
+        screen.fill(light_blue)
+        board_col = white
+        pygame.draw.line(screen, board_col, constant.level1_board1_start, constant.level1_board1_end, 3)
+        pygame.draw.line(screen, board_col, constant.level1_board2_start, constant.level1_board2_end, 3)
 
-    pygame.draw.line(screen, board_col, constant.level1_board3_start, constant.level1_board3_end, 3)
-    pygame.draw.line(screen, board_col, constant.level1_board4_start, constant.level1_board4_end, 3)
-    screen.blit(player, (player_x, player_y))            
+        pygame.draw.line(screen, board_col, constant.level1_board3_start, constant.level1_board3_end, 3)
+        pygame.draw.line(screen, board_col, constant.level1_board4_start, constant.level1_board4_end, 3)
+        screen.blit(player, (player_x, player_y))   
+
+    elif level == 2 :
+        screen.fill(light_blue)
+        screen.blit(player, (player_x, player_y)) 
+        board_col = white
+        pygame.draw.line(screen, board_col, constant.level2_board1_start, constant.level2_board1_end, 3)
     
     pygame.display.update()
 
