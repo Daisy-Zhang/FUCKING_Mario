@@ -97,6 +97,9 @@ while True:
     if player_y > deadline:   # determine whether player is falling to death
     	print('Game Over')
     	exit()
+    
+    if player_x < 0:    #  restrict the player of going back
+        player_x = 0
 
     if level == 1 :            
         screen.fill(light_blue)
@@ -110,7 +113,7 @@ while True:
 
     elif level == 2 :
         screen.fill(light_blue)
-        screen.blit(player, (player_x, player_y)) 
+        screen.blit(player, (player_x, player_y))
         board_col = white
         pygame.draw.line(screen, board_col, constant.level2_board1_start, constant.level2_board1_end, 3)
     
