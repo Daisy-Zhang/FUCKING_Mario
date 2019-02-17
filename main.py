@@ -64,7 +64,7 @@ while True:
         up_speed += a  # speed change due to gravity
 
     # fall to the ground
-    if player_y >= ground:
+    if player_y >= ground and player_y - ground < 10:
         player_y = ground
         up_speed = 0
         jump_direction = 0
