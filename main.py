@@ -28,6 +28,7 @@ height = 250	# height of a jump on a ground
 move_speed = 0.8    #horizontal move speed
 a = -4 * height / (total_jump_time ** 2)  # coefficient of jump action
 up_speed = 0	# the speed of up going
+jump_direction = 0	# 0 jump vertically    1 jump towards left    2 jump towards right
 
 pipe = 0     # to indicate whether there is a pipe
 
@@ -66,11 +67,12 @@ while True:
     if player_y >= ground:
     	player_y = ground
     	up_speed = 0
+	jump_direction = 0
 
-    if key_pressed[pygame.K_LEFT]:
+    if (key_pressed[pygame.K_LEFT] and player_y == ground) or jump_direction == 1:
     	player_x -= move_speed  #keep moving left
 
-    if key_pressed[pygame.K_RIGHT]:
+    if (key_pressed[pygame.K_RIGHT] and player_y == ground) or jump_direction == 2:
     	player_x += move_speed
 
     for event in pygame.event.get():
@@ -80,6 +82,10 @@ while True:
         if event.type == KEYDOWN:
             if event.key == K_UP and player_y == ground:
                 up_speed = 1.5 		#trigger jump action at line 40
+		if key_pressed[pygame.K_LEFT]:
+                	jump_direction = 1
+                elif key_pressed[pygame.K_RIGHT]:
+                	jump_direction = 2
             elif event.key == K_DOWN and pipe == 1:   # for the pipe or something like that
                 player_y += 30
 
