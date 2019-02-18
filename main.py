@@ -30,7 +30,10 @@ deadline = 700		# the falling deadline
 total_jump_time = 500	# total time of a jump on a ground
 height = 600	# height of a jump on a ground
 
-move_speed = 0.6    #horizontal move speed
+move_speed = 0      # horizental move speed
+top_move_speed = 0.6    # horizontal top move speed
+or_acceleration = 0.00003    # original horizental move acceleration
+acceleration = or_acceleration    # horizental move acceleration
 a = -4 * height / (total_jump_time ** 2)  # coefficient of jump action
 up_speed = 0	# the speed of up going
 jump_direction = 0	# 0 jump vertically    1 jump towards left    2 jump towards right
@@ -41,10 +44,14 @@ pipe = 0     # to indicate whether there is a pipe
 
 def getGround(player_x, player_y, level):   # to get the ground y coordinate
     ground = inf
+    left = 0
+    right = 1
     for groundline in constant.levelGround[level - 1]:
         if groundline[0] <= player_x + constant.player_x_size and groundline[1] >= player_x and player_y + constant.player_y_size <= groundline[2] + 2 * restrictParameter and ground > groundline[2]:
             ground = groundline[2]
-    return ground
+            left = groundline[0]
+            right = groundline[1]
+    return ground, left, right
 
 def toNextLevel(player_x, player_y):
     if player_x + constant.player_x_size >= 670 :
@@ -54,11 +61,14 @@ def toNextLevel(player_x, player_y):
 
 def showMap(level):
     screen.fill(light_blue)
-    board_col = white
-    for groundline in constant.levelGround[level - 1]:
-        pygame.draw.line(screen, board_col, [groundline[0], groundline[2]], [groundline[1], groundline[2]], 3)
-    for wallline in constant.levelWall[level - 1]:
-        pygame.draw.line(screen, board_col, [wallline[2], wallline[0]], [wallline[2], wallline[1]], 3)
+    box_col = white
+    for box in constant.boxes[level - 1]:
+        x = box[0][0][0]
+        y = box[1][0][0]
+        length = box[0][0][1] - box[0][0][0]
+        height = box[1][0][1] - box[1][0][0]
+        box_col = box[2]
+        pygame.draw.rect(screen, box_col, (x, y, length, height))
     screen.blit(player, (player_x, player_y))   
 
 
@@ -71,7 +81,7 @@ while True:
         player_x = 0
         level += 1
 
-    ground = getGround(player_x, player_y, level)    # the ground position y coordinate
+    ground, left, right = getGround(player_x, player_y, level)    # the ground position y coordinate
     key_pressed = pygame.key.get_pressed()	# to get the list of whether or not a key is pressed
 
     if not (up_speed == 0 and player_y == ground):   # determine whether to move under gravity
@@ -105,10 +115,19 @@ while True:
             
 
     if (key_pressed[pygame.K_LEFT] and player_y + constant.player_y_size == ground) or jump_direction == 1:
-    	player_x -= move_speed  #keep moving left
+        player_x -= move_speed  #keep moving left
+        if move_speed < top_move_speed:
+            move_speed += acceleration
+            acceleration += or_acceleration
 
-    if (key_pressed[pygame.K_RIGHT] and player_y + constant.player_y_size == ground) or jump_direction == 2:
-    	player_x += move_speed
+    elif (key_pressed[pygame.K_RIGHT] and player_y + constant.player_y_size == ground) or jump_direction == 2:
+        player_x += move_speed
+        if move_speed < top_move_speed:
+            move_speed += acceleration
+            acceleration += or_acceleration
+    else:
+        move_speed = 0
+        acceleration = or_acceleration
 
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -119,10 +138,14 @@ while True:
                 up_speed = 1.5 		#trigger jump action at line 40
             if key_pressed[pygame.K_LEFT] and player_y + constant.player_y_size == ground:
                     jump_direction = 1
-            elif key_pressed[pygame.K_RIGHT] and player_y + constant.player_y_size == ground:
+            elif key_pressed[pygame.K_RIGHT] and (player_y + constant.player_y_size == ground or (player_y + constant.player_y_size < left and left - player_y + constant.player_y_size < 1 and player_x + constant.player_x_size < left and left - player_x - constant.player_y_size < 1)):
                 	jump_direction = 2
-            elif event.key == K_DOWN and pipe == 1:   # for the pipe or something like that
+            if event.key == K_DOWN and pipe == 1:   # for the pipe or something like that
                 player_y += 30
+    if player_y + constant.player_y_size <= ground and ground - player_y - constant.player_y_size < 10 and player_x + constant.player_x_size < left and left - player_x - constant.player_y_size < 10:
+        jump_direction = 1
+    if player_y + constant.player_y_size <= ground and ground - player_y - constant.player_y_size < 10 and player_x > right and right - player_x < 10:
+        jump_direction = 2
 
     if player_y > deadline:   # determine whether player is falling to death
     	print('Game Over')
