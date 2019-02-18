@@ -1,5 +1,6 @@
 import pygame
-import constant
+import box
+import enemy
 from pygame.locals import *
 from sys import exit
 
@@ -45,15 +46,15 @@ def getGround(player_x, player_y, level):   # to get the ground y coordinate
     ground = inf
     left = 0
     right = 1
-    for groundline in constant.levelGround[level - 1]:
-        if groundline[0] <= player_x + constant.player_x_size and groundline[1] >= player_x and player_y + constant.player_y_size <= groundline[2] + 2 * restrictParameter and ground > groundline[2]:
+    for groundline in box.levelGround[level - 1]:
+        if groundline[0] <= player_x + box.player_x_size and groundline[1] >= player_x and player_y + box.player_y_size <= groundline[2] + 2 * restrictParameter and ground > groundline[2]:
             ground = groundline[2]
             left = groundline[0]
             right = groundline[1]
     return ground, left, right
 
 def toNextLevel(player_x, player_y):
-    if player_x + constant.player_x_size >= 670 :
+    if player_x + box.player_x_size >= 670 :
         return True
     else:
         return False
@@ -61,22 +62,23 @@ def toNextLevel(player_x, player_y):
 def showMap(level):
     screen.fill(light_blue)
     box_col = white
-    for box in constant.boxes[level - 1]:
-        x = box[0][0][0]
-        y = box[1][0][0]
-        length = box[0][0][1] - box[0][0][0]
-        height = box[1][0][1] - box[1][0][0]
-        box_col = box[2]
+    for box_ in box.boxes[level - 1]:
+        x = box_[0][0][0]
+        y = box_[1][0][0]
+        length = box_[0][0][1] - box_[0][0][0]
+        height = box_[1][0][1] - box_[1][0][0]
+        box_col = box_[2]
         pygame.draw.rect(screen, box_col, (x, y, length, height))
+
+    # load enemy test
+    enemy1 = pygame.image.load(enemy.level1_enemy1.getEnemyImageFile()).convert()
+    if enemy.level1_enemy1.judgeDeath() == enemy.constant.ENEMY_ALIVE :
+        enemy.level1_enemy1.enemyMove()
+        screen.blit(enemy1, (enemy.level1_enemy1.getEnemyX(), enemy.level1_enemy1.getEnemyY()))
     screen.blit(player, (player_x, player_y))   
 
 
-
-
-
 while True:
-
-
 
     if toNextLevel(player_x, player_y):
         player_x = 0
@@ -91,38 +93,38 @@ while True:
         up_speed += a  # speed change due to gravity
 
     # fall to the ground
-    if player_y + constant.player_y_size >= ground and player_y - ground < restrictParameter:
-        player_y = ground - constant.player_y_size
+    if player_y + box.player_y_size >= ground and player_y - ground < restrictParameter:
+        player_y = ground - box.player_y_size
         up_speed = 0
         jump_direction = 0
 
     # prevent the player from crossing the aboving ground
     # reflection
-    for groundline in constant.levelGround[level - 1]:
-        if groundline[0] <= player_x + constant.player_x_size and groundline[1] >= player_x and player_y < groundline[2] and groundline[2] - player_y < 10:
+    for groundline in box.levelGround[level - 1]:
+        if groundline[0] <= player_x + box.player_x_size and groundline[1] >= player_x and player_y < groundline[2] and groundline[2] - player_y < 10:
             player_y = groundline[2]
             up_speed = -up_speed
             break;
 
     # prevent player from crossing walls
-    for wallline in constant.levelWall[level - 1]:
-        if wallline[0] < player_y + constant.player_y_size and wallline[1] > player_y:
-            if wallline[2] > player_x + constant.player_x_size and wallline[2] - player_x - constant.player_x_size < restrictParameter:
-                player_x = wallline[2] - constant.player_x_size - restrictParameter
+    for wallline in box.levelWall[level - 1]:
+        if wallline[0] < player_y + box.player_y_size and wallline[1] > player_y:
+            if wallline[2] > player_x + box.player_x_size and wallline[2] - player_x - box.player_x_size < restrictParameter:
+                player_x = wallline[2] - box.player_x_size - restrictParameter
                 break;
             if wallline[2] < player_x and player_x - wallline[2] < restrictParameter:
                 player_x = wallline[2] + restrictParameter
                 break;
             
 
-    if (key_pressed[pygame.K_LEFT] and player_y + constant.player_y_size == ground) or jump_direction == 1:
+    if (key_pressed[pygame.K_LEFT] and player_y + box.player_y_size == ground) or jump_direction == 1:
         player_x -= move_speed  #keep moving left
         player_image_file = 'image/player_re.png'
         if move_speed < top_move_speed:
             move_speed += acceleration
             acceleration += or_acceleration
 
-    elif (key_pressed[pygame.K_RIGHT] and player_y + constant.player_y_size == ground) or jump_direction == 2:
+    elif (key_pressed[pygame.K_RIGHT] and player_y + box.player_y_size == ground) or jump_direction == 2:
         player_x += move_speed
         player_image_file = 'image/player.png'
         if move_speed < top_move_speed:
@@ -137,17 +139,17 @@ while True:
             exit()
 
         if event.type == KEYDOWN:
-            if event.key == K_UP and player_y + constant.player_y_size == ground:
+            if event.key == K_UP and player_y + box.player_y_size == ground:
                 up_speed = 1.5 		#trigger jump action at line 40
-            if key_pressed[pygame.K_LEFT] and player_y + constant.player_y_size == ground:
+            if key_pressed[pygame.K_LEFT] and player_y + box.player_y_size == ground:
                     jump_direction = 1
-            elif key_pressed[pygame.K_RIGHT] and (player_y + constant.player_y_size == ground or (player_y + constant.player_y_size < left and left - player_y + constant.player_y_size < 1 and player_x + constant.player_x_size < left and left - player_x - constant.player_y_size < 1)):
+            elif key_pressed[pygame.K_RIGHT] and (player_y + box.player_y_size == ground or (player_y + box.player_y_size < left and left - player_y + box.player_y_size < 1 and player_x + box.player_x_size < left and left - player_x - box.player_y_size < 1)):
                 	jump_direction = 2
             if event.key == K_DOWN and pipe == 1:   # for the pipe or something like that
                 player_y += 30
-    if player_y + constant.player_y_size <= ground and ground - player_y - constant.player_y_size < 10 and player_x + constant.player_x_size < left and left - player_x - constant.player_y_size < 10:
+    if player_y + box.player_y_size <= ground and ground - player_y - box.player_y_size < 10 and player_x + box.player_x_size < left and left - player_x - box.player_y_size < 10:
         jump_direction = 1
-    if player_y + constant.player_y_size <= ground and ground - player_y - constant.player_y_size < 10 and player_x > right and right - player_x < 10:
+    if player_y + box.player_y_size <= ground and ground - player_y - box.player_y_size < 10 and player_x > right and right - player_x < 10:
         jump_direction = 2
 
     if player_y > deadline:   # determine whether player is falling to death
