@@ -27,40 +27,51 @@ light_blue = (128, 128, 255)
 inf = 1000000		#  setting the bottom limit
 deadline = 700		# the falling deadline
 
-total_jump_time = 180	# total time of a jump on a ground
-height = 200	# height of a jump on a ground
+total_jump_time = 500	# total time of a jump on a ground
+height = 600	# height of a jump on a ground
 
-move_speed = 0.8    #horizontal move speed
+move_speed = 0.6    #horizontal move speed
 a = -4 * height / (total_jump_time ** 2)  # coefficient of jump action
 up_speed = 0	# the speed of up going
 jump_direction = 0	# 0 jump vertically    1 jump towards left    2 jump towards right
+restrictParameter = 1
 
 pipe = 0     # to indicate whether there is a pipe
 
 
-def getGround(player_x):   # to get the ground y coordinate, it is set in advance
-	if player_x <= constant.level1_back1_no_ground_start or player_x + constant.player_x_size / 2 >= constant.level1_back1_no_ground_end:
-		return constant.level1_back1_ground
-	elif player_x < 640:
-		return inf
+def getGround(player_x, player_y, level):   # to get the ground y coordinate
+    ground = inf
+    for groundline in constant.levelGround[level - 1]:
+        if groundline[0] <= player_x + constant.player_x_size and groundline[1] >= player_x and player_y + constant.player_y_size <= groundline[2] + 2 * restrictParameter and ground > groundline[2]:
+            ground = groundline[2]
+    return ground
 
 def toNextLevel(player_x, player_y):
-    if level == 1:
-        if player_x + constant.player_x_size >= 630 :
-            return True
-        else:
-            return False
+    if player_x + constant.player_x_size >= 670 :
+        return True
+    else:
+        return False
+
+def showMap(level):
+    screen.fill(light_blue)
+    board_col = white
+    for groundline in constant.levelGround[level - 1]:
+        pygame.draw.line(screen, board_col, [groundline[0], groundline[2]], [groundline[1], groundline[2]], 3)
+    for wallline in constant.levelWall[level - 1]:
+        pygame.draw.line(screen, board_col, [wallline[2], wallline[0]], [wallline[2], wallline[1]], 3)
+    screen.blit(player, (player_x, player_y))   
+
+
+
 
 
 while True:
 
-    if toNextLevel(player_x, player_y) :
-        if level == 1:
-            player_x = 0
-            player_y = 300
-            level += 1
+    if toNextLevel(player_x, player_y):
+        player_x = 0
+        level += 1
 
-    ground = getGround(player_x)    # the ground position y coordinate
+    ground = getGround(player_x, player_y, level)    # the ground position y coordinate
     key_pressed = pygame.key.get_pressed()	# to get the list of whether or not a key is pressed
 
     if not (up_speed == 0 and player_y == ground):   # determine whether to move under gravity
@@ -69,15 +80,34 @@ while True:
         up_speed += a  # speed change due to gravity
 
     # fall to the ground
-    if player_y >= ground and player_y - ground < 10:
-        player_y = ground
+    if player_y + constant.player_y_size >= ground and player_y - ground < restrictParameter:
+        player_y = ground - constant.player_y_size
         up_speed = 0
         jump_direction = 0
 
-    if (key_pressed[pygame.K_LEFT] and player_y == ground) or jump_direction == 1:
+    # prevent the player from crossing the aboving ground
+    # reflection
+    for groundline in constant.levelGround[level - 1]:
+        if groundline[0] <= player_x + constant.player_x_size and groundline[1] >= player_x and player_y < groundline[2] and groundline[2] - player_y < 10:
+            player_y = groundline[2]
+            up_speed = -up_speed
+            break;
+
+    # prevent player from crossing walls
+    for wallline in constant.levelWall[level - 1]:
+        if wallline[0] < player_y + constant.player_y_size and wallline[1] > player_y:
+            if wallline[2] > player_x + constant.player_x_size and wallline[2] - player_x - constant.player_x_size < restrictParameter:
+                player_x = wallline[2] - constant.player_x_size - restrictParameter
+                break;
+            if wallline[2] < player_x and player_x - wallline[2] < restrictParameter:
+                player_x = wallline[2] + restrictParameter
+                break;
+            
+
+    if (key_pressed[pygame.K_LEFT] and player_y + constant.player_y_size == ground) or jump_direction == 1:
     	player_x -= move_speed  #keep moving left
 
-    if (key_pressed[pygame.K_RIGHT] and player_y == ground) or jump_direction == 2:
+    if (key_pressed[pygame.K_RIGHT] and player_y + constant.player_y_size == ground) or jump_direction == 2:
     	player_x += move_speed
 
     for event in pygame.event.get():
@@ -85,11 +115,11 @@ while True:
             exit()
 
         if event.type == KEYDOWN:
-            if event.key == K_UP and player_y == ground:
+            if event.key == K_UP and player_y + constant.player_y_size == ground:
                 up_speed = 1.5 		#trigger jump action at line 40
-            if key_pressed[pygame.K_LEFT] and player_y == ground:
+            if key_pressed[pygame.K_LEFT] and player_y + constant.player_y_size == ground:
                     jump_direction = 1
-            elif key_pressed[pygame.K_RIGHT] and player_y == ground:
+            elif key_pressed[pygame.K_RIGHT] and player_y + constant.player_y_size == ground:
                 	jump_direction = 2
             elif event.key == K_DOWN and pipe == 1:   # for the pipe or something like that
                 player_y += 30
@@ -101,21 +131,7 @@ while True:
     if player_x < 0:    #  restrict the player of going back
         player_x = 0
 
-    if level == 1 :            
-        screen.fill(light_blue)
-        board_col = white
-        pygame.draw.line(screen, board_col, constant.level1_board1_start, constant.level1_board1_end, 3)
-        pygame.draw.line(screen, board_col, constant.level1_board2_start, constant.level1_board2_end, 3)
+    showMap(level)       
 
-        pygame.draw.line(screen, board_col, constant.level1_board3_start, constant.level1_board3_end, 3)
-        pygame.draw.line(screen, board_col, constant.level1_board4_start, constant.level1_board4_end, 3)
-        screen.blit(player, (player_x, player_y))   
-
-    elif level == 2 :
-        screen.fill(light_blue)
-        screen.blit(player, (player_x, player_y))
-        board_col = white
-        pygame.draw.line(screen, board_col, constant.level2_board1_start, constant.level2_board1_end, 3)
-    
     pygame.display.update()
 
