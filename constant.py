@@ -1,20 +1,28 @@
-player_x_size = 50
+player_x_size = 46
+player_y_size = 50
 
-level1_board1_start = (0, 350)
-level1_board1_end = (500, 350)
+num = 3   # number of levels
 
-level1_board2_start = (500, 350)
-level1_board2_end = (500, 480)
+def box(x, y, length, height):   # return [boxGrounds, boxWalls]
+	return [[[x, x + length, y], [x, x + length, y + height]], [[y, y + height, x], [y, y + height, x + length]]]
 
-level1_board3_start = (600, 350)
-level1_board3_end = (640, 350)
+boxes = []
 
-level1_board4_start = (600, 350)
-level1_board4_end = (600, 480)
+#  level 1
+boxes.append([box(0, 350, 500, 130), box(600, 350, 40, 130)])
 
-level1_back1_ground = 300
-level1_back1_no_ground_start = 500
-level1_back1_no_ground_end = 600
+#  level 2
+boxes.append([box(0, 350, 640, 130), box(100, 250, 200, 200)])
 
-level2_board1_start = (0, 350)
-level2_board1_end = (640, 350)
+#  level 3
+boxes.append([box(0, 350, 300, 130), box(150, 300, 100, 50), box(300, 200, 150, 50), box(400, 320, 240, 160)])
+
+levelGround = []
+levelWall = []
+
+for level in range(num):
+    levelGround.append([])
+    levelWall.append([])
+    for box in boxes[level]:
+        levelGround[level].extend(box[0])
+        levelWall[level].extend(box[1])
