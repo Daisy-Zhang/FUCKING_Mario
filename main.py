@@ -14,7 +14,6 @@ pygame.mixer.music.set_volume(0.2)
 pygame.mixer.music.play()
 
 player_image_file = 'image/player.png'
-player = pygame.image.load(player_image_file).convert()
 player_x = 0
 player_y = 300
 
@@ -77,6 +76,8 @@ def showMap(level):
 
 while True:
 
+
+
     if toNextLevel(player_x, player_y):
         player_x = 0
         level += 1
@@ -116,12 +117,14 @@ while True:
 
     if (key_pressed[pygame.K_LEFT] and player_y + constant.player_y_size == ground) or jump_direction == 1:
         player_x -= move_speed  #keep moving left
+        player_image_file = 'image/player_re.png'
         if move_speed < top_move_speed:
             move_speed += acceleration
             acceleration += or_acceleration
 
     elif (key_pressed[pygame.K_RIGHT] and player_y + constant.player_y_size == ground) or jump_direction == 2:
         player_x += move_speed
+        player_image_file = 'image/player.png'
         if move_speed < top_move_speed:
             move_speed += acceleration
             acceleration += or_acceleration
@@ -154,7 +157,8 @@ while True:
     if player_x < 0:    #  restrict the player of going back
         player_x = 0
 
-    showMap(level)       
+    player = pygame.image.load(player_image_file).convert()
+    showMap(level)
 
     pygame.display.update()
 
