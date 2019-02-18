@@ -12,7 +12,7 @@ boxes = []
 boxes.append([box(0, 350, 500, 130), box(600, 350, 40, 130)])
 
 #  level 2
-boxes.append([box(0, 350, 640, 130), box(100, 250, 200, 200)])
+boxes.append([box(0, 350, 640, 130)])
 
 #  level 3
 boxes.append([box(0, 350, 300, 130), box(150, 300, 100, 50), box(300, 200, 150, 50), box(400, 320, 240, 160)])
