@@ -2,17 +2,22 @@ import constant
 import move
 
 class role():            # basic class, funny just for test
-    
+
     role_type = 0    #  role_type = 0 player,   role_type = 1 enemy
     role_x = 0    #  position of the role
     role_y = 0
     role_image_file = "null"    #   role image file name
 
+    start_moving = 0   #   the position of player when the role start moving
+    app = 0
+
+
     role_x_size = 0    #  role size
     role_y_size = 0
 
-    health = 0    #   health of the role
     top_health = 100
+    health = top_health    #   health of the role
+    
 
     total_jump_time = 200   # total time of a jump on a ground
     jump_height = 120    # height of a jump on a ground
@@ -26,6 +31,13 @@ class role():            # basic class, funny just for test
     or_acceleration = 0.0003    # original horizental move acceleration
     acceleration = or_acceleration    # horizental move acceleration
 
+    face = 1   #   face = 1 towards right    face = -1 towards left
+
+    def setApp(self, a):
+        self.app = a
+
+    def setStartMoving(self, s):
+        self.start_moving = s
 
     def setRoleType(self, rt):
         self.role_type = rt
@@ -71,6 +83,16 @@ class role():            # basic class, funny just for test
 
     def setAcceleration(self, acc):
         self.acceleration = acc
+
+    def setFace(self, f):
+        self.face = f
+
+    
+    def getApp(self):
+        return self.app
+
+    def getStartMoving(self):
+        return self.start_moving
 
     def getRoleType(self):
         return self.role_type
@@ -123,6 +145,9 @@ class role():            # basic class, funny just for test
     def getJumpSpeed(self):
         return - self.getA() * self.total_jump_time / 2
 
+    def getFace(self):
+        return self.face
+
     def judgeDeath(self):
         if self.health <= 0:
             return constant.ROLE_DIED
@@ -132,13 +157,3 @@ class role():            # basic class, funny just for test
     #maybe next time to finish them
     #def beAttacked(self):
     #def beTouched(self, player_x, player_y):
-
-# just for quick test
-# level1_enemy1 = enemy()
-# level1_enemy1.setImageFile("image/enemy1.png")
-# level1_enemy1.setEnemyInitialPos(100, 290)
-# level1_enemy1.setEnemyTrack(100, 300, 200, 300)
-# level1_enemy1.setDirection('h')
-# level1_enemy1.setInitialFaceto('r')
-# level1_enemy1.setSpeed(2)
-# level1_enemy1.setHealth(1)
