@@ -10,6 +10,7 @@ from sys import exit
 pygame.init()
 level = 1
 screen = pygame.display.set_mode((640, 480), 0, 32)
+pygame.display.set_caption('Fucking Mario')
 
 player_x_size = 46
 player_y_size = 50
@@ -130,7 +131,7 @@ while True:
             enemy.setApp(1)
         if not enemy.getHealth() == 0 and enemy.getApp() == 1:
             move.move(enemy, level)
-            enemyImage = pygame.image.load(enemy2.getRoleImageFile()).convert()
+            enemyImage = pygame.image.load(enemy.getRoleImageFile()).convert()
             screen.blit(enemyImage, (enemy.getRoleX(), enemy.getRoleY()))
         if touch(player1, enemy):
             print('Game Over')
