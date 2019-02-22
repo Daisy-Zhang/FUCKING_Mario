@@ -6,6 +6,7 @@ from pygame.locals import *
 from sys import exit
 
 inf = 1000000		#  setting the bottom limit
+deadline = 700		# the falling deadline
 
 
 def getGround(role_x, role_y, role_x_size, role_y_size, level):   # to get the ground y coordinate
@@ -54,43 +55,58 @@ def move(r, level):   #  r is a role object
             if wallline[2] < r.getRoleX() and r.getRoleX() - wallline[2] < constant.RESTRICT_PARAMETER:
                 r.setRoleX(wallline[2] + constant.RESTRICT_PARAMETER)
                 break
-            
 
-    if (key_pressed[pygame.K_LEFT] and r.getRoleY() + r.getRoleYSize() == ground) or r.getJumpDirection() == 1:
-        r.setRoleX(r.getRoleX() - r.getMoveSpeed())  #keep moving left
-        r.setImageFile('image/player_re.png')
-        if r.getMoveSpeed() < r.getTopMoveSpeed() and not r.getJumpDirection() == 1:
-            r.setMoveSpeed(r.getMoveSpeed() + r.getAcceleration())
-            r.setAcceleration(r.getAcceleration() + r.getOrAcceleration())
+    #  keyboard_control players
+    if r.getRoleType() == 0:
+        if (key_pressed[pygame.K_LEFT] and r.getRoleY() + r.getRoleYSize() == ground) or r.getJumpDirection() == 1:
+            r.setRoleX(r.getRoleX() - r.getMoveSpeed())  #keep moving left
+            r.setImageFile('image/player_re.png')
+            r.setFace(-1)
+            if r.getMoveSpeed() < r.getTopMoveSpeed() and not r.getJumpDirection() == 1:
+                r.setMoveSpeed(r.getMoveSpeed() + r.getAcceleration())
+                r.setAcceleration(r.getAcceleration() + r.getOrAcceleration())
 
-    elif (key_pressed[pygame.K_RIGHT] and r.getRoleY() + r.getRoleYSize() == ground) or r.getJumpDirection() == 2:
-        r.setRoleX(r.getRoleX() + r.getMoveSpeed())
-        r.setImageFile('image/player.png')
-        if r.getMoveSpeed() < r.getTopMoveSpeed() and not r.getJumpDirection() == 2:
-            r.setMoveSpeed(r.getMoveSpeed() + r.getAcceleration())
-            r.setAcceleration(r.getAcceleration() + r.getOrAcceleration())
-    else:
-        r.setMoveSpeed(0.1)
-        r.setMoveSpeed(r.getOrAcceleration())
+        elif (key_pressed[pygame.K_RIGHT] and r.getRoleY() + r.getRoleYSize() == ground) or r.getJumpDirection() == 2:
+            r.setRoleX(r.getRoleX() + r.getMoveSpeed())
+            r.setImageFile('image/player.png')
+            r.setFace(1)
+            if r.getMoveSpeed() < r.getTopMoveSpeed() and not r.getJumpDirection() == 2:
+                r.setMoveSpeed(r.getMoveSpeed() + r.getAcceleration())
+                r.setAcceleration(r.getAcceleration() + r.getOrAcceleration())
+        else:
+            r.setMoveSpeed(0.1)
+            r.setMoveSpeed(r.getOrAcceleration())
 
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            exit()
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                exit()
 
-        if event.type == KEYDOWN:
-            if event.key == K_UP and r.getRoleY() + r.getRoleYSize() == ground:
-                r.setUpSpeed(r.getJumpSpeed())		#trigger jump action at line 40
-                if key_pressed[pygame.K_LEFT] and r.getRoleY() + r.getRoleYSize() == ground:
-                    r.setJumpDirection(1)
-                elif key_pressed[pygame.K_RIGHT] and r.getRoleY() + r.getRoleYSize() == ground:
-                    r.setJumpDirection(2)
+            if event.type == KEYDOWN:
+                if event.key == K_UP and r.getRoleY() + r.getRoleYSize() == ground:
+                    r.setUpSpeed(r.getJumpSpeed())		#trigger jump action at line 40
+                    if key_pressed[pygame.K_LEFT] and r.getRoleY() + r.getRoleYSize() == ground:
+                        r.setJumpDirection(1)
+                    elif key_pressed[pygame.K_RIGHT] and r.getRoleY() + r.getRoleYSize() == ground:
+                        r.setJumpDirection(2)
 
-            if event.key == K_DOWN:   # for the pipe or something like that
-                r.setRoleY(r.getRoleY() - 30)
-        if r.getRoleY() + r.getRoleYSize() <= ground and ground - r.getRoleY() - r.getRoleYSize() < 10 and r.getRoleX() + r.getRoleXSize() < left and left - r.getRoleX() - r.getRoleXSize() < 10:
-	        r.setJumpDirection(1)
-        if r.getRoleY() + r.getRoleYSize() <= ground and ground - r.getRoleY() - r.getRoleYSize() < 10 and r.getRoleX() > right and right - r.getRoleX() < 10:
-	        r.setJumpDirection(2)
+                if event.key == K_DOWN:   # for the pipe or something like that
+                    r.setRoleY(r.getRoleY() - 30)
+            if r.getRoleY() + r.getRoleYSize() <= ground and ground - r.getRoleY() - r.getRoleYSize() < 10 and r.getRoleX() + r.getRoleXSize() < left and left - r.getRoleX() - r.getRoleXSize() < 10:
+                r.setJumpDirection(1)
+            if r.getRoleY() + r.getRoleYSize() <= ground and ground - r.getRoleY() - r.getRoleYSize() < 10 and r.getRoleX() > right and right - r.getRoleX() < 10:
+                r.setJumpDirection(2)
+
+    #  non_keyboard_control others
+    if r.getRoleType() == 1:
+        if (r.face == -1 and r.getRoleY() + r.getRoleYSize() == ground) or r.getJumpDirection() == 1:
+            r.setRoleX(r.getRoleX() - r.getMoveSpeed())
+        elif (r.face == 1 and r.getRoleY() + r.getRoleYSize() == ground) or r.getJumpDirection() == 2:
+            r.setRoleX(r.getRoleX() + r.getMoveSpeed())
+        r.setFace(-1)
+        r.setMoveSpeed(0.3)
 
     if r.getRoleX() < 0:    #  restrict the player of going back
         r.setRoleX(0)
+
+    if r.getRoleY() > deadline:
+        r.setHealth(0)
